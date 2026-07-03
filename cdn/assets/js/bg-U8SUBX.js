@@ -4,13 +4,21 @@ const ctx = canvas.getContext('2d');
 canvas.width = window.innerWidth;
 canvas.height = window.innerHeight;
 
+let maxParticles = canvas.width < 768 ? 40 : 80; 
+
 window.addEventListener('resize', () => {
     canvas.width = window.innerWidth;
     canvas.height = window.innerHeight;
+    maxParticles = canvas.width < 768 ? 40 : 80;
+    particles.forEach(p => p.resetIfOutOfBounds());
 });
 
 class Particle {
     constructor() {
+        this.init();
+    }
+
+    init() {
         this.x = Math.random() * canvas.width;
         this.y = Math.random() * canvas.height;
         this.vx = (Math.random() - 0.5) * 0.8;
@@ -18,6 +26,12 @@ class Particle {
         this.radius = Math.random() * 2 + 1;
         this.opacity = Math.random() * 0.5 + 0.3;
         this.hue = Math.random() * 60 + 260;
+    }
+
+    resetIfOutOfBounds() {
+        if (this.x > canvas.width || this.y > canvas.height) {
+            this.init();
+        }
     }
 
     update() {
@@ -53,7 +67,7 @@ class Wave {
         ctx.beginPath();
         ctx.moveTo(0, canvas.height / 2 + this.yOffset);
         
-        for (let x = 0; x < canvas.width; x++) {
+        for (let x = 0; x < canvas.width; x += 5) {
             const y = canvas.height / 2 + this.yOffset + 
                         Math.sin(x * this.frequency + this.phase) * this.amplitude;
             ctx.lineTo(x, y);
@@ -114,8 +128,8 @@ function drawFloatingOrbs() {
 }
 
 function connectParticles() {
-    for (let i = 0; i < particles.length; i++) {
-        for (let j = i + 1; j < particles.length; j++) {
+    for (let i = 0; i < maxParticles; i++) {
+        for (let j = i + 1; j < maxParticles; j++) {
             const dx = particles[i].x - particles[j].x;
             const dy = particles[i].y - particles[j].y;
             const distance = Math.sqrt(dx * dx + dy * dy);
@@ -141,10 +155,10 @@ function animate() {
         wave.draw();
     });
 
-    particles.forEach(particle => {
-        particle.update();
-        particle.draw();
-    });
+    for (let i = 0; i < maxParticles; i++) {
+        particles[i].update();
+        particles[i].draw();
+    }
 
     connectParticles();
 
