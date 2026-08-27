@@ -48,3 +48,7 @@ function portfolio() {
 function cola149() {
     window.open('https://cola149.ru', '_blank');
 }
+
+function pdnkbot() {
+    window.open('https://google.com/')
+}
